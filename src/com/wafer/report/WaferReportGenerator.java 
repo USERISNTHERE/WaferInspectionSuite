@@ -1,0 +1,37 @@
+package com.wafer.report;
+
+import com.wafer.model.Die;
+import com.wafer.model.Wafer;
+
+import java.util.List;
+
+public class WaferReportGenerator {
+
+    public static void printExecutiveSummary(Wafer wafer) {
+        List<Die> dies = wafer.getAllDies();
+        int totalDies = dies.size();
+        
+        long defectiveCount = dies.stream().filter(Die::isDefective).count();
+        long healthyCount = totalDies - defectiveCount;
+        double yieldPercentage = ((double) healthyCount / totalDies) * 100.0;
+
+        long edgeRingCount = dies.stream().filter(d -> "Edge-Ring Defect".equals(d.getDefectCategory())).count();
+        long scratchCount = dies.stream().filter(d -> "Scratch Defect".equals(d.getDefectCategory())).count();
+        long centerClusterCount = dies.stream().filter(d -> "Center-Cluster Defect".equals(d.getDefectCategory())).count();
+
+        System.out.println("\n==================================================");
+        System.out.println("          SEMICONDUCTOR WAFER INSPECTION REPORT    ");
+        System.out.println("==================================================");
+        System.out.println(" Wafer ID          : " + wafer.getWaferId());
+        System.out.println(" Total Grid Dies   : " + totalDies);
+        System.out.println(" Healthy Dies      : " + healthyCount);
+        System.out.println(" Defective Dies    : " + defectiveCount);
+        System.out.println(String.format(" Manufacturing Yield: %.2f%%", yieldPercentage));
+        System.out.println("--------------------------------------------------");
+        System.out.println(" DEFECT CLASSIFICATION BREAKDOWN:");
+        System.out.println(" • Edge-Ring Defects    : " + edgeRingCount);
+        System.out.println(" • Scratch Defects      : " + scratchCount);
+        System.out.println(" • Center-Cluster Yield : " + centerClusterCount);
+        System.out.println("==================================================\n");
+    }
+}

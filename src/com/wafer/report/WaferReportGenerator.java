@@ -1,5 +1,5 @@
 package com.wafer.report;
-
+import java.util.ArrayList;
 import com.wafer.model.Die;
 import com.wafer.model.Wafer;
 
@@ -8,7 +8,8 @@ import java.util.List;
 public class WaferReportGenerator {
 
     public static void printExecutiveSummary(Wafer wafer) {
-        List<Die> dies = wafer.getAllDies();
+        List<Die> dies = new java.util.ArrayList<>(wafer.getAllDies());
+
         int totalDies = dies.size();
         
         long defectiveCount = dies.stream().filter(Die::isDefective).count();

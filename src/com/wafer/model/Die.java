@@ -34,7 +34,7 @@ public class Die {
     public String getDefectCategory() { return defectCategory; }
     public void setDefectCategory(String defectCategory) { this.defectCategory = defectCategory; }
 
-    @format.ToString
+
     @Override
     public String toString() {
         return String.format("Die[%d,%d] (Leakage: %.2f, Speed: %.2f) -> %s", 

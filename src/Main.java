@@ -10,21 +10,28 @@ import com.wafer.report.WaferReportGenerator;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Initializing Wafer Inspection Suite (Final Pipeline)...");
+        System.out.println("==================================================");
+        System.out.println("   RUNNING ROBUSTNESS TESTS ACROSS MULTIPLE PROFILES");
+        System.out.println("==================================================\n");
 
-        // 1. Ingest/Parse Wafer Dataset
-        Wafer testWafer = WaferParser.parseWaferData("WAFER-2026-FINAL", 30);
-
-        // 2. Execute Multi-Threaded Defect Classification Strategies
         ClassifierContext context = new ClassifierContext();
-        
+
+        // --- Test 1: Edge-Ring Profile ---
+        Wafer edgeRingWafer = WaferParser.parseWaferData("WAFER-EDGERING-01", 20, "EDGERING");
         context.setStrategy(new EdgeRingAndScratchStrategy());
-        ConcurrentWaferAnalyzer.analyzeConcurrently(testWafer, new EdgeRingAndScratchStrategy());
+        ConcurrentWaferAnalyzer.analyzeConcurrently(edgeRingWafer, new EdgeRingAndScratchStrategy());
+        WaferReportGenerator.printExecutiveSummary(edgeRingWafer);
 
+        // --- Test 2: Scratch Profile ---
+        Wafer scratchWafer = WaferParser.parseWaferData("WAFER-SCRATCH-02", 20, "SCRATCH");
+        context.setStrategy(new EdgeRingAndScratchStrategy());
+        ConcurrentWaferAnalyzer.analyzeConcurrently(scratchWafer, new EdgeRingAndScratchStrategy());
+        WaferReportGenerator.printExecutiveSummary(scratchWafer);
+
+        // --- Test 3: Center-Cluster Profile ---
+        Wafer clusterWafer = WaferParser.parseWaferData("WAFER-CLUSTER-03", 20, "CENTERCLUSTER");
         context.setStrategy(new CenterClusterStrategy());
-        ConcurrentWaferAnalyzer.analyzeConcurrently(testWafer, new CenterClusterStrategy());
-
-        // 3. Generate Final Executive Report Dashboard
-        WaferReportGenerator.printExecutiveSummary(testWafer);
+        ConcurrentWaferAnalyzer.analyzeConcurrently(clusterWafer, new CenterClusterStrategy());
+        WaferReportGenerator.printExecutiveSummary(clusterWafer);
     }
 }

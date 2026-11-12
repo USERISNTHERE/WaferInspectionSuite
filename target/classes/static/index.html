@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Industrial Wafer Quality Control Dashboard</title>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 20px; }
+        h1 { color: #38bdf8; text-align: center; }
+        .controls { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        button { background-color: #0284c7; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        button:hover { background-color: #0369a1; }
+        .status-banner { text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 15px; padding: 12px; background: #1e293b; border-radius: 8px; border: 1px solid #334155; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .stats-card { background: #1e293b; border: 1px solid #334155; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto 20px auto; display: flex; justify-content: space-around; text-align: center; }
+        .stat-box h3 { margin: 0 0 5px 0; color: #94a3b8; font-size: 14px; }
+        .stat-box p { margin: 0; font-size: 22px; font-weight: bold; color: #f8fafc; }
+        pre { background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155; max-width: 600px; margin: 0 auto; max-height: 400px; overflow-y: auto; color: #38bdf8; }
+    </style>
+</head>
+<body>
+    <h1>Industrial Wafer Quality Control Dashboard</h1>
+    <div class="status-banner">Quality Status: <span id="statusIcon">⏳ Waiting for scan...</span></div>
+    <div class="controls">
+        <button onclick="fetchInspection('/api/wafer/inspect?profile=edge')">Run Edge-Ring Profile</button>
+        <button onclick="fetchInspection('/api/wafer/inspect?profile=scratch')">Run Linear Scratch</button>
+        <button onclick="fetchInspection('/api/wafer/inspect?profile=cluster')">Run Center-Cluster</button>
+    </div>
+    <div class="stats-card">
+        <div class="stat-box"><h3>Total Dies</h3><p id="totalDies">-</p></div>
+        <div class="stat-box"><h3>Defective Dies</h3><p id="defectiveDies" style="color: #ef4444;">-</p></div>
+        <div class="stat-box"><h3>Defect Rate</h3><p id="defectPercentage" style="color: #f59e0b;">-%</p></div>
+    </div>
+    <pre id="output">Click a button above to run inspection scan...</pre>
+    <script>
+        async function fetchInspection(url) {
+            try {
+                document.getElementById('output').innerText = "Running inspection scan...";
+                const response = await fetch(url);
+                const data = await response.json();
+                const total = data.totalDies || 0;
+                const defective = data.defectiveCount || 0;
+                const percentage = total > 0 ? ((defective / total) * 100).toFixed(2) : 0;
+                document.getElementById('totalDies').innerText = total;
+                document.getElementById('defectiveDies').innerText = defective;
+                document.getElementById('defectPercentage').innerText = percentage + "%";
+                const statusIcon = document.getElementById('statusIcon');
+                if (parseFloat(percentage) < 15.0) {
+                    statusIcon.innerHTML = "😊 Optimal Quality (Pass)";
+                    statusIcon.style.color = "#22c55e";
+                } else {
+                    statusIcon.innerHTML = "😢 High Defect Rate (Review Needed)";
+                    statusIcon.style.color = "#ef4444";
+                }
+                document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('output').innerText = "Error connecting to server: " + error;
+            }
+        }
+    </script>
+</body>
+</html>
